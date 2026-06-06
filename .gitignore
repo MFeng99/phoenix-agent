@@ -1,0 +1,37 @@
+# ============================================================
+# Phoenix
+# ============================================================
+phoenix/config.json
+phoenix/registry.json
+phoenix/versions/
+*.log
+
+# ============================================================
+# AgentOS Framework
+# ============================================================
+agent-os/framework/config/env.json
+agent-os/framework/config/permissions.json
+agent-os/framework/storage/
+agent-os/framework/agent-memory/
+agent-os/framework/data/
+agent-os/framework/node_modules/
+agent-os/framework/.cdp_scripts/
+agent-os/framework/.pytest_cache/
+agent-os/framework/.qdrant-initialized
+agent-os/framework/scripts/phoenix/config.json
+agent-os/framework/scripts/phoenix/registry.json
+agent-os/framework/scripts/phoenix/versions/
+
+# User config at root
+.env
+ecosystem.config.js
+
+# ============================================================
+# General
+# ============================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.DS_Store
+Thumbs.db

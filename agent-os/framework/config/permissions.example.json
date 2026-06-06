@@ -1,0 +1,5 @@
+{
+  "_comment": "Permission levels: P0=blocked, P1=read-only, P2=user, P3=admin",
+  "admin": { "level": "P3", "note": "Super admin" },
+  "user": { "level": "P2", "note": "Standard user" }
+}

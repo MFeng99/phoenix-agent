@@ -1,0 +1,23 @@
+{
+  "check_interval": 30,
+  "deep_check_interval": 300,
+  "cooldown_seconds": 300,
+  "max_failures": 2,
+  "max_alerts_per_day": 50,
+  "alert_cooldown_minutes": 10,
+  "feishu_webhook_url": "",
+  "log_dir": "~/Desktop/hermes-logs",
+  "log_retain_days": 7,
+  "log_file": "~/Desktop/hermes-logs/phoenix.log",
+  "services": {
+    "my-app": {
+      "type": "port_http",
+      "port": 3000
+    },
+    "my-api": {
+      "type": "port_http",
+      "port": 8080,
+      "path": "/health"
+    }
+  }
+}
