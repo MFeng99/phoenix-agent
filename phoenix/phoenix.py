@@ -32,8 +32,8 @@ COOLDOWN_SECONDS = 300
 MAX_FAILURES = 2
 FEISHU_WEBHOOK_URL = ""
 
-# 日志路径默认值
-_LOG_DIR_DEFAULT = os.path.join(os.path.expanduser("~"), "Desktop", "agent-os-logs")
+# 日志路径默认值（可用 AGENT_OS_LOG_DIR 覆盖；不依赖 ~/Desktop 等平台特有位置）
+_LOG_DIR_DEFAULT = os.environ.get("AGENT_OS_LOG_DIR") or os.path.join(BASE_DIR, "logs")
 _LOG_FILE_DEFAULT = os.path.join(_LOG_DIR_DEFAULT, "phoenix.log")
 
 # ── 运行时状态 ───────────────────────────────────────
@@ -56,13 +56,17 @@ def _import_modules():
 
 # ── 配置 ──────────────────────────────────────────────
 def load_config():
-    """加载配置并展开 ~ 路径"""
+    """加载配置并把路径解析为绝对路径（~ 展开到 home，相对路径锚定到 phoenix 目录）"""
     with open(CONFIG_PATH, "r", encoding="utf-8") as f:
         cfg = json.load(f)
-    # 展开路径中的 ~
     for key in ("log_dir", "log_file"):
-        if key in cfg and isinstance(cfg[key], str) and cfg[key].startswith("~"):
-            cfg[key] = os.path.expanduser(cfg[key])
+        v = cfg.get(key)
+        if not isinstance(v, str):
+            continue
+        if v.startswith("~"):
+            cfg[key] = os.path.expanduser(v)
+        elif not os.path.isabs(v):
+            cfg[key] = os.path.join(BASE_DIR, v)
     return cfg
 
 

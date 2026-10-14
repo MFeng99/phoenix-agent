@@ -13,6 +13,7 @@ import subprocess
 import signal
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from scripts.paths import log_file, ensure_parent  # noqa: E402
 
 BANNER = r"""
 ╔══════════════════════════════════════════════╗
@@ -64,8 +65,8 @@ def check_services(verbose=True):
 
 def start_framework_service():
     """启动框架 FastAPI 服务"""
-    log_path = os.path.join(os.path.expanduser("~"), "Desktop", "framework_log.md")
-    os.makedirs(os.path.dirname(log_path), exist_ok=True)
+    log_path = log_file()
+    ensure_parent(log_path)
     print("\n  启动 Framework Service...")
 
     code = [

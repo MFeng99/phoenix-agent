@@ -19,6 +19,9 @@ import json
 from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from scripts.paths import state_file  # noqa: E402
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from scripts.agent_log import log_action
 from core.freelance_agent import FreelanceAgent
@@ -167,9 +170,7 @@ def main():
                         help="新消息时是否通知（默认 none）")
     args = parser.parse_args()
 
-    STATE_FILE = os.path.join(
-        os.path.expanduser("~"), "Desktop", "agent-os-logs", "freelance-state.json"
-    )
+    STATE_FILE = state_file("freelance-state.json")
 
     print(r"""
   ╔═══════════════════════════════════════════╗

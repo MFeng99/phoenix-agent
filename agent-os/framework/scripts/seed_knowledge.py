@@ -18,6 +18,9 @@ import os
 import sys
 import uuid
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from scripts.paths import data_dir  # noqa: E402
+
 sys.path.insert(0, os.path.dirname(__file__))
 from qdrant_lib import qdrant_upsert, qdrant_health, qdrant_search
 
@@ -74,13 +77,13 @@ def find_data_dir():
     """查找数据目录，依次尝试:
     1. 框架根目录下的 data/
     2. scripts/ 同级的 data/
-    3. 用户桌面的 data/
+    3. 数据根目录下的 data/（默认 <framework>/var/data，可用 AGENT_OS_DATA_DIR 覆盖）
     """
-    framework_root = os.path.dirname(os.path.dirname(__file__))
+    framework_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     candidates = [
         os.path.join(framework_root, "data"),
-        os.path.join(os.path.dirname(__file__), "data"),
-        os.path.join(os.path.expanduser("~"), "Desktop", "framework-data"),
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "data"),
+        os.path.join(data_dir(), "data"),
     ]
     for c in candidates:
         if os.path.isdir(c):

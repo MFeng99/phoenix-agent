@@ -1,8 +1,12 @@
 """TaskState 任务状态机 — 持久化 + 断点续跑"""
 import os
+import sys
 import json
 import time
 from datetime import datetime, timezone
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from scripts.paths import state_file  # noqa: E402
 
 _STATES_VALID = {
     "CREATED", "RUNNING", "WAITING", "RESUMING", "DONE", "FAILED", "RETRYING", "ABORTED",
@@ -19,9 +23,7 @@ _TRANSITIONS = {
     "ABORTED":   [],
 }
 
-_DEFAULT_PATH = os.path.join(
-    os.path.expanduser("~"), "Desktop", "agent-os-logs", "task-states.jsonl"
-)
+_DEFAULT_PATH = state_file("task-states.jsonl")
 
 
 class TaskState:

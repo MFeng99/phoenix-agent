@@ -11,7 +11,7 @@
     print(tail_log(10))          # 最近 10 条
     print(get_recent("FAILED"))  # 所有失败的操作
 
-日志文件: ~/Desktop/framework_log.md (自动根据当前用户生成)
+日志文件: <framework>/var/logs/framework_log.md (可用 AGENT_LOG_PATH 覆盖)
 格式: | 时间 | Agent | 操作 | 状态 | 详情 |
 """
 import os
@@ -19,8 +19,12 @@ import sys
 import threading
 from datetime import datetime, timezone
 
+# 让 scripts.paths 在「直接执行脚本」与「作为包导入」两种方式下都可用
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from scripts.paths import log_file, ensure_parent  # noqa: E402
 
-_LOG_PATH = os.path.join(os.path.expanduser("~"), "Desktop", "framework_log.md")
+
+_LOG_PATH = log_file()
 
 _LOCK = threading.Lock()
 
@@ -37,6 +41,7 @@ HEADER = """# Orchestrator + Executor 共享操作日志
 def _ensure_header():
     """确保日志文件存在并包含表头"""
     if not os.path.exists(_LOG_PATH):
+        ensure_parent(_LOG_PATH)
         with open(_LOG_PATH, "w", encoding="utf-8") as f:
             f.write(HEADER)
 
@@ -130,6 +135,7 @@ def tail_log(n=10):
 def clear_log():
     """清空日志文件并重建表头"""
     with _LOCK:
+        ensure_parent(_LOG_PATH)
         with open(_LOG_PATH, "w", encoding="utf-8") as f:
             f.write(HEADER)
     return {"status": "cleared", "path": _LOG_PATH}

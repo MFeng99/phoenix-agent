@@ -4,6 +4,7 @@
 phoenix/config.json
 phoenix/registry.json
 phoenix/versions/
+phoenix/logs/
 *.log
 
 # ============================================================
@@ -15,12 +16,14 @@ agent-os/framework/storage/
 agent-os/framework/agent-memory/
 agent-os/framework/data/
 agent-os/framework/node_modules/
+agent-os/framework/var/
 agent-os/framework/.cdp_scripts/
 agent-os/framework/.pytest_cache/
 agent-os/framework/.qdrant-initialized
 agent-os/framework/scripts/phoenix/config.json
 agent-os/framework/scripts/phoenix/registry.json
 agent-os/framework/scripts/phoenix/versions/
+agent-os/framework/scripts/phoenix/logs/
 
 # User config at root
 .env

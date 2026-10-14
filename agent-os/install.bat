@@ -390,9 +390,9 @@ if exist "%ECOSYSTEM_FILE%" (
         set "VAL_QDRANT_STORAGE=%ROOT%\data\qdrant"
 
         set "VAL_PHOENIX_DIR=%FRAMEWORK_DIR%\scripts\phoenix"
-        set "VAL_PHOENIX_LOG_DIR=%USERPROFILE%\Desktop\agent-os-logs"
+        set "VAL_PHOENIX_LOG_DIR=%ROOT%\var\logs"
 
-        set "VAL_LOG_DIR=%USERPROFILE%\Desktop\agent-os-logs"
+        set "VAL_LOG_DIR=%ROOT%\var\logs"
         set "VAL_PM2_HOME=%USERPROFILE%\.pm2"
 
         :: Use PowerShell for robust multi-variable template replacement
