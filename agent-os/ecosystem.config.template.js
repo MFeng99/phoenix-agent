@@ -18,56 +18,56 @@
 module.exports = {
   apps: [
     // ────────────────────────────────────────────────────────────
-    // 1. Hermes WebUI Bridge
+    // 1. Orchestrator WebUI Bridge
     // ────────────────────────────────────────────────────────────
-    // Serves the Hermes Web UI (port 8648). Runs a Python script
-    // from the Hermes virtual environment that bridges the web
-    // interface to the Hermes backend.
+    // Serves the Orchestrator Web UI (port 8648). Runs a Python script
+    // from the Orchestrator virtual environment that bridges the web
+    // interface to the Orchestrator backend.
     {
-      name: 'hermes-webui-bridge',
-      script: '{{HERMES_VENV_PYTHON}}',
-      args: '-m hermes.webui_bridge',
-      cwd: '{{HERMES_DIR}}',
+      name: 'orchestrator-webui-bridge',
+      script: '{{ORCHESTRATOR_VENV_PYTHON}}',
+      args: '{{ORCHESTRATOR_WEBUI_ARGS}}',
+      cwd: '{{ORCHESTRATOR_DIR}}',
       interpreter: '',
       env: {
         PYTHONUNBUFFERED: '1',
-        HERMES_HOME: '{{HERMES_HOME}}',
+        ORCHESTRATOR_HOME: '{{ORCHESTRATOR_HOME}}',
         HOST: '0.0.0.0',
-        PORT: '{{HERMES_WEBUI_PORT:8648}}',
+        PORT: '{{ORCHESTRATOR_WEBUI_PORT:8648}}',
       },
       watch: false,
       max_restarts: 5,
       restart_delay: 3000,
-      error_file: '{{LOG_DIR}}/hermes-webui-bridge-error.log',
-      out_file: '{{LOG_DIR}}/hermes-webui-bridge-out.log',
+      error_file: '{{LOG_DIR}}/orchestrator-webui-bridge-error.log',
+      out_file: '{{LOG_DIR}}/orchestrator-webui-bridge-out.log',
       merge_logs: true,
       log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
     },
 
     // ────────────────────────────────────────────────────────────
-    // 2. Hermes Gateway
+    // 2. Orchestrator Gateway
     // ────────────────────────────────────────────────────────────
-    // The Hermes API gateway. Uses the `hermes gateway run` CLI
-    // command (provided by the Hermes Python package installed
+    // The Orchestrator API gateway. Uses the `orchestrator gateway run` CLI
+    // command (provided by the Orchestrator Python package installed
     // in the venv). Handles routing and authentication.
     {
-      name: 'hermes-gateway',
-      script: '{{HERMES_VENV_PYTHON}}',
-      args: '-m hermes.gateway run',
-      cwd: '{{HERMES_DIR}}',
+      name: 'orchestrator-gateway',
+      script: '{{ORCHESTRATOR_VENV_PYTHON}}',
+      args: '{{ORCHESTRATOR_GATEWAY_ARGS}}',
+      cwd: '{{ORCHESTRATOR_DIR}}',
       interpreter: '',
       env: {
         PYTHONUNBUFFERED: '1',
-        HERMES_HOME: '{{HERMES_HOME}}',
-        HERMES_GATEWAY_PORT: '{{HERMES_GATEWAY_PORT:9090}}',
-        HERMES_GATEWAY_HOST: '0.0.0.0',
-        HERMES_API_KEY: '{{HERMES_API_KEY}}',
+        ORCHESTRATOR_HOME: '{{ORCHESTRATOR_HOME}}',
+        ORCHESTRATOR_GATEWAY_PORT: '{{ORCHESTRATOR_GATEWAY_PORT:9090}}',
+        ORCHESTRATOR_GATEWAY_HOST: '0.0.0.0',
+        ORCHESTRATOR_API_KEY: '{{ORCHESTRATOR_API_KEY}}',
       },
       watch: false,
       max_restarts: 5,
       restart_delay: 5000,
-      error_file: '{{LOG_DIR}}/hermes-gateway-error.log',
-      out_file: '{{LOG_DIR}}/hermes-gateway-out.log',
+      error_file: '{{LOG_DIR}}/orchestrator-gateway-error.log',
+      out_file: '{{LOG_DIR}}/orchestrator-gateway-out.log',
       merge_logs: true,
       log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
     },
@@ -90,6 +90,7 @@ module.exports = {
         FRAMEWORK_API_KEY: '{{FRAMEWORK_API_KEY}}',
         FRAMEWORK_AGENT_DIR: '{{FRAMEWORK_AGENT_DIR}}',
         FRAMEWORK_CDP_DIR: '{{FRAMEWORK_CDP_DIR}}',
+        EXECUTOR_CLI: '{{EXECUTOR_CLI}}',
         QDRANT_HOST: '127.0.0.1',
         QDRANT_PORT: '{{QDRANT_PORT:6333}}',
         CDP_PORT: '{{CDP_PORT:9333}}',
@@ -104,28 +105,28 @@ module.exports = {
     },
 
     // ────────────────────────────────────────────────────────────
-    // 4. OpenClaw Gateway
+    // 4. Executor Gateway
     // ────────────────────────────────────────────────────────────
-    // OpenClaw agent gateway (port 18789). A Node.js service
-    // from the `openclaw` npm package. Provides agent-based
+    // Executor agent gateway (port 18789). A Node.js service
+    // from the `executor` npm package. Provides agent-based
     // task execution capabilities to the framework.
     {
-      name: 'openclaw-gateway',
-      script: '{{OPENCLAW_BIN}}',
-      args: 'gateway --port {{OPENCLAW_PORT:18789}} --host 0.0.0.0',
-      cwd: '{{OPENCLAW_DIR}}',
+      name: 'executor-gateway',
+      script: '{{EXECUTOR_BIN}}',
+      args: 'gateway --port {{EXECUTOR_PORT:18789}} --host 0.0.0.0',
+      cwd: '{{EXECUTOR_DIR}}',
       interpreter: '',
       env: {
         NODE_ENV: 'production',
-        OPENCLAW_CONFIG_DIR: '{{OPENCLAW_CONFIG_DIR}}',
-        OPENCLAW_API_KEY: '{{OPENCLAW_API_KEY}}',
+        EXECUTOR_CONFIG_DIR: '{{EXECUTOR_CONFIG_DIR}}',
+        EXECUTOR_API_KEY: '{{EXECUTOR_API_KEY}}',
         LOG_LEVEL: 'info',
       },
       watch: false,
       max_restarts: 5,
       restart_delay: 5000,
-      error_file: '{{LOG_DIR}}/openclaw-gateway-error.log',
-      out_file: '{{LOG_DIR}}/openclaw-gateway-out.log',
+      error_file: '{{LOG_DIR}}/executor-gateway-error.log',
+      out_file: '{{LOG_DIR}}/executor-gateway-out.log',
       merge_logs: true,
       log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
     },
@@ -209,7 +210,7 @@ module.exports = {
     // Logs are written to {{PHOENIX_LOG_DIR}}/phoenix.log
     {
       name: 'phoenix-watcher',
-      script: '{{HERMES_VENV_PYTHON}}',
+      script: '{{ORCHESTRATOR_VENV_PYTHON}}',
       args: '{{PHOENIX_DIR}}/phoenix.py',
       cwd: '{{PHOENIX_DIR}}',
       interpreter: '',
@@ -241,12 +242,14 @@ module.exports = {
  *  ┌──────────────────────────────┬───────────────────────────────────────────┐
  *  │ Variable                     │ Description                              │
  *  ├──────────────────────────────┼───────────────────────────────────────────┤
- *  │ {{HERMES_DIR}}               │ Path to Hermes installation directory     │
- *  │ {{HERMES_HOME}}              │ Hermes home/config directory              │
- *  │ {{HERMES_VENV_PYTHON}}       │ Full path to Hermes venv python.exe      │
- *  │ {{HERMES_WEBUI_PORT}}        │ WebUI bridge port (default: 8648)        │
- *  │ {{HERMES_GATEWAY_PORT}}      │ Gateway port (default: 9090)             │
- *  │ {{HERMES_API_KEY}}           │ API key for Hermes gateway auth          │
+ *  │ {{ORCHESTRATOR_DIR}}               │ Path to Orchestrator installation directory     │
+ *  │ {{ORCHESTRATOR_HOME}}              │ Orchestrator home/config directory              │
+ *  │ {{ORCHESTRATOR_VENV_PYTHON}}       │ Full path to Orchestrator venv python.exe      │
+ *  │ {{ORCHESTRATOR_WEBUI_ARGS}}        │ CLI args to launch the WebUI bridge      │
+ *  │ {{ORCHESTRATOR_GATEWAY_ARGS}}      │ CLI args to launch the API gateway       │
+ *  │ {{ORCHESTRATOR_WEBUI_PORT}}        │ WebUI bridge port (default: 8648)        │
+ *  │ {{ORCHESTRATOR_GATEWAY_PORT}}      │ Gateway port (default: 9090)             │
+ *  │ {{ORCHESTRATOR_API_KEY}}           │ API key for Orchestrator gateway auth          │
  *  ├──────────────────────────────┼───────────────────────────────────────────┤
  *  │ {{FRAMEWORK_DIR}}            │ Path to framework/ directory             │
  *  │ {{FRAMEWORK_VENV_PYTHON}}    │ Path to framework venv python.exe        │
@@ -255,11 +258,12 @@ module.exports = {
  *  │ {{FRAMEWORK_AGENT_DIR}}      │ Agent memory/state directory             │
  *  │ {{FRAMEWORK_CDP_DIR}}        │ CDP script directory                     │
  *  ├──────────────────────────────┼───────────────────────────────────────────┤
- *  │ {{OPENCLAW_DIR}}             │ OpenClaw package directory               │
- *  │ {{OPENCLAW_BIN}}             │ OpenClaw CLI binary path                 │
- *  │ {{OPENCLAW_PORT}}            │ OpenClaw gateway port (default: 18789)   │
- *  │ {{OPENCLAW_CONFIG_DIR}}      │ OpenClaw config directory                │
- *  │ {{OPENCLAW_API_KEY}}         │ API key for OpenClaw auth                │
+ *  │ {{EXECUTOR_DIR}}             │ Executor package directory               │
+ *  │ {{EXECUTOR_BIN}}             │ Executor CLI binary path                 │
+ *  │ {{EXECUTOR_PORT}}            │ Executor gateway port (default: 18789)   │
+ *  │ {{EXECUTOR_CONFIG_DIR}}      │ Executor config directory                │
+ *  │ {{EXECUTOR_API_KEY}}         │ API key for Executor auth                │
+ *  │ {{EXECUTOR_CLI}}             │ Executor runtime CLI name or path        │
  *  ├──────────────────────────────┼───────────────────────────────────────────┤
  *  │ {{CHROME_PATH}}              │ Full path to chrome.exe / google-chrome  │
  *  │ {{CHROME_USER_DATA_DIR}}     │ Chrome user data directory               │

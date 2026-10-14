@@ -1,5 +1,5 @@
-# qdrant_lib.py — 知识库核心工具（Hermes 直接调用，无中间 MCP 层）
-# 用法：在 Hermes 能访问的 Python 环境中 import 使用
+# qdrant_lib.py — 知识库核心工具（Orchestrator 直接调用，无中间 MCP 层）
+# 用法：在 Orchestrator 能访问的 Python 环境中 import 使用
 # 依赖：requests, sentence-transformers (或 fallback)
 import os, sys, json, uuid, hashlib, math
 from datetime import datetime, timezone
@@ -13,7 +13,11 @@ COLLECTION_ECOMMERCE = "ecommerce"  # 电商业务写 ecommerce
 try:
     os.environ.setdefault("HF_HUB_OFFLINE", "1")
     from sentence_transformers import SentenceTransformer
-    _st = SentenceTransformer("all-MiniLM-L6-v2", cache_folder="F:\\AI Agent\\models")
+    _cache_dir = os.environ.get(
+        "EMBEDDING_CACHE_DIR",
+        os.path.join(os.path.expanduser("~"), ".cache", "agent-os", "models"),
+    )
+    _st = SentenceTransformer("all-MiniLM-L6-v2", cache_folder=_cache_dir)
     def embed(text):
         vec = _st.encode(text, normalize_embeddings=True)
         return vec.tolist()

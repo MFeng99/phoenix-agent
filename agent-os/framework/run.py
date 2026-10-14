@@ -17,14 +17,14 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 BANNER = r"""
 ╔══════════════════════════════════════════════╗
 ║     Framework v5.0 Service                   ║
-║     Hermes + OpenClaw 双Agent 框架服务化      ║
+║     Orchestrator + Executor 双Agent 框架服务化      ║
 ║     Port: 18888                              ║
 ╚══════════════════════════════════════════════╝
 """
 
 SERVICES = {
     "Qdrant": {"port": 6333, "url": "http://127.0.0.1:6333/healthz"},
-    "OpenClaw": {"port": 18789, "url": "http://127.0.0.1:18789/"},
+    "Executor": {"port": 18789, "url": "http://127.0.0.1:18789/"},
     "WebUI": {"port": 8648, "url": "http://127.0.0.1:8648/"},
     "CDP": {"port": 9333, "url": "http://127.0.0.1:9333/json/version"},
 }

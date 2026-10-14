@@ -33,7 +33,7 @@ MAX_FAILURES = 2
 FEISHU_WEBHOOK_URL = ""
 
 # 日志路径默认值
-_LOG_DIR_DEFAULT = os.path.join(os.path.expanduser("~"), "Desktop", "hermes-logs")
+_LOG_DIR_DEFAULT = os.path.join(os.path.expanduser("~"), "Desktop", "agent-os-logs")
 _LOG_FILE_DEFAULT = os.path.join(_LOG_DIR_DEFAULT, "phoenix.log")
 
 # ── 运行时状态 ───────────────────────────────────────

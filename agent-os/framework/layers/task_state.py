@@ -20,7 +20,7 @@ _TRANSITIONS = {
 }
 
 _DEFAULT_PATH = os.path.join(
-    os.path.expanduser("~"), "Desktop", "hermes-logs", "task-states.jsonl"
+    os.path.expanduser("~"), "Desktop", "agent-os-logs", "task-states.jsonl"
 )
 
 

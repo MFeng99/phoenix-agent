@@ -26,9 +26,9 @@ from qdrant_lib import qdrant_upsert, qdrant_health, qdrant_search
 
 BUILTIN_ENTRIES = [
     {
-        "content": "Hermes+OpenClaw v5.0架构：移除Framework MCP中间层，所有风险评估和权限校验由Hermes内建推理完成。OpenClaw由PM2守护，崩溃自动拉起。Qdrant采用ai+ecommerce双collection策略。",
+        "content": "Orchestrator+Executor v5.0架构：移除Framework MCP中间层，所有风险评估和权限校验由Orchestrator内建推理完成。Executor由PM2守护，崩溃自动拉起。Qdrant采用ai+ecommerce双collection策略。",
         "score": 10, "confidence": 1.0, "category": "tech",
-        "tags": ["architecture", "v5.0", "hermes", "openclaw", "pm2", "qdrant"],
+        "tags": ["architecture", "v5.0", "orchestrator", "executor", "pm2", "qdrant"],
     },
     {
         "content": "PM2替代自写Guardian是v5.0最大改进。旧Guardian(v1.4-v4.1)用端口和日志猜测进程状态，误判导致反复杀CLI。PM2作为父进程，子进程退出立刻知道，100%准确。配置：max_memory_restart=800M, max_restarts=10, restart_delay=5s。",
@@ -36,12 +36,12 @@ BUILTIN_ENTRIES = [
         "tags": ["pm2", "guardian", "self-healing", "process-management"],
     },
     {
-        "content": "qdrant_lib.py极简封装：4个函数(search/upsert/hit/health)，直连port 6333，无中间层。sentence-transformers离线模式+hash fallback保证无网络时也能工作。embedding缓存到F:\\AI Agent\\models。",
+        "content": "qdrant_lib.py极简封装：4个函数(search/upsert/hit/health)，直连port 6333，无中间层。sentence-transformers离线模式+hash fallback保证无网络时也能工作。embedding缓存目录由 EMBEDDING_CACHE_DIR 环境变量配置。",
         "score": 9, "confidence": 0.9, "category": "tech",
         "tags": ["qdrant", "embedding", "knowledge-base", "qdrant_lib"],
     },
     {
-        "content": "启动流程v5.0极简：4步，无串行依赖。Qdrant→OpenClaw(PM2)→Hermes WebUI→Chrome CDP。hermes-web-ui启动需15-30秒才能端口就绪，脚本内有轮询等待逻辑。",
+        "content": "启动流程v5.0极简：4步，无串行依赖。Qdrant→Executor(PM2)→Orchestrator WebUI→Chrome CDP。orchestrator-web-ui启动需15-30秒才能端口就绪，脚本内有轮询等待逻辑。",
         "score": 8, "confidence": 0.9, "category": "tech",
         "tags": ["startup", "boot", "launcher", "bat"],
     },

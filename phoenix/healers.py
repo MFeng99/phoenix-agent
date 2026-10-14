@@ -3,16 +3,16 @@
 各组件恢复逻辑，按配置路由
 """
 
+import os
 import subprocess
 import time
 
 
 def heal_cdp():
-    """重启CDP Chrome（路径从环境变量或同级目录自动检测）"""
-    import os
+    """重启 CDP Chrome（脚本路径从环境变量或同级目录自动检测）"""
     cdp_script = os.environ.get(
         "CDP_MANAGER_PATH",
-        os.path.join(os.path.dirname(__file__), "cdp_manager.py")
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "cdp_manager.py"),
     )
     try:
         result = subprocess.run(
@@ -80,7 +80,7 @@ if __name__ == "__main__":
     # Dry-run: just print what we would do
     test_configs = [
         ("chrome-cdp", {"heal_type": "cdp_launch"}),
-        ("openclaw-gateway", {"heal_type": "pm2_restart", "pm2_name": "openclaw-gateway"}),
+        ("executor-gateway", {"heal_type": "pm2_restart", "pm2_name": "executor-gateway"}),
     ]
     for name, cfg in test_configs:
         print(f"  {name}: heal_type={cfg['heal_type']}")

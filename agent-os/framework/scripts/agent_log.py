@@ -1,11 +1,11 @@
-"""共享操作日志 — Hermes↔OpenClaw 双Agent通信黑盒透明化
+"""共享操作日志 — Orchestrator↔Executor 双Agent通信黑盒透明化
 
 用法:
     from scripts.agent_log import log_action, tail_log, get_recent
 
-    log_action("Hermes", "analyze", "评估用户意图为商品搜索", "OK")
-    log_action("OpenClaw", "browser.open", "打开 Fiverr 卖家中心", "RUNNING")
-    log_action("OpenClaw", "browser.fill", "填写商品标题: Test Product", "DONE")
+    log_action("Orchestrator", "analyze", "评估用户意图为商品搜索", "OK")
+    log_action("Executor", "browser.open", "打开 Fiverr 卖家中心", "RUNNING")
+    log_action("Executor", "browser.fill", "填写商品标题: Test Product", "DONE")
 
     # 实时查看最近操作
     print(tail_log(10))          # 最近 10 条
@@ -24,9 +24,9 @@ _LOG_PATH = os.path.join(os.path.expanduser("~"), "Desktop", "framework_log.md")
 
 _LOCK = threading.Lock()
 
-HEADER = """# Hermes + OpenClaw 共享操作日志
+HEADER = """# Orchestrator + Executor 共享操作日志
 
-> 自动生成 — 记录 Hermes（推理/主控）与 OpenClaw（执行引擎）之间的每一步操作。
+> 自动生成 — 记录 Orchestrator（推理/主控）与 Executor（执行引擎）之间的每一步操作。
 > 格式: | 时间 | Agent | 操作 | 状态 | 详情 |
 
 | 时间 | Agent | 操作 | 状态 | 详情 |
@@ -50,7 +50,7 @@ def log_action(agent, action, detail="", status="OK"):
     """记录一次操作到共享日志
 
     Args:
-        agent: 执行者 — "Hermes" 或 "OpenClaw"
+        agent: 执行者 — "Orchestrator" 或 "Executor"
         action: 操作名，如 "analyze", "browser.open", "qdrant.search"
         detail: 操作详情，如 "搜索关键词: TikTok 商品"
         status: 操作状态 — "OK", "FAILED", "RUNNING", "PENDING", "DONE", "SKIPPED"
@@ -183,7 +183,7 @@ if __name__ == "__main__":
         print(tail_log(n))
     else:
         # 交互模式：写一条测试日志
-        log_action("Hermes", "test", "agent_log.py 模块加载测试", "OK")
+        log_action("Orchestrator", "test", "agent_log.py 模块加载测试", "OK")
         print(f"日志文件: {_LOG_PATH}")
         print(f"最近 5 条:")
         print(tail_log(5))

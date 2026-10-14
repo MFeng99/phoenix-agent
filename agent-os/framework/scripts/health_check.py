@@ -1,4 +1,4 @@
-"""框架健康检查 — 检查 Hermes+OpenClaw 所有关键服务端口
+"""框架健康检查 — 检查 Orchestrator+Executor 所有关键服务端口
 
 用法:
     python scripts/health_check.py              # 完整检查，表格输出
@@ -22,13 +22,13 @@ SERVICES = {
         "role": "向量知识库",
         "required": True,
     },
-    "OpenClaw": {
+    "Executor": {
         "port": 18789,
         "url": "http://127.0.0.1:18789/",
         "role": "执行引擎网关",
         "required": True,
     },
-    "Hermes WebUI": {
+    "Orchestrator WebUI": {
         "port": 8648,
         "url": "http://127.0.0.1:8648/",
         "role": "主控推理面板",
@@ -151,10 +151,10 @@ def print_table(results):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Hermes+OpenClaw 框架健康检查")
+    parser = argparse.ArgumentParser(description="Orchestrator+Executor 框架健康检查")
     parser.add_argument("--json", action="store_true", help="JSON 格式输出")
     parser.add_argument("--watch", type=int, metavar="N", help="每 N 秒循环检查")
-    parser.add_argument("--service", type=str, help="仅检查指定服务（Qdrant/OpenClaw/WebUI/CDP）")
+    parser.add_argument("--service", type=str, help="仅检查指定服务（Qdrant/Executor/WebUI/CDP）")
     args = parser.parse_args()
 
     if args.watch:
@@ -173,7 +173,7 @@ def main():
         return
 
     if args.service:
-        name_map = {"qdrant": "Qdrant", "openclaw": "OpenClaw", "webui": "Hermes WebUI", "cdp": "Chrome CDP"}
+        name_map = {"qdrant": "Qdrant", "executor": "Executor", "webui": "Orchestrator WebUI", "cdp": "Chrome CDP"}
         svc_name = name_map.get(args.service.lower(), args.service)
         info = SERVICES.get(svc_name)
         if not info:
@@ -188,7 +188,7 @@ def main():
         print(json.dumps(results, ensure_ascii=False, indent=2))
     else:
         print("=" * 70)
-        print("  Hermes + OpenClaw 框架健康检查")
+        print("  Orchestrator + Executor 框架健康检查")
         print("=" * 70)
         print_table(results)
 

@@ -17,24 +17,24 @@ def test_agent_log_basic():
     from scripts.agent_log import log_action, get_recent, tail_log, log_path
 
     # 写入测试日志
-    log_action("Hermes", "test.analyze", "评估用户意图", "OK")
-    log_action("OpenClaw", "test.execute", "执行浏览器操作", "RUNNING")
-    log_action("OpenClaw", "test.execute", "浏览器操作完成", "DONE")
-    log_action("Hermes", "test.verify", "验证执行结果", "OK")
+    log_action("Orchestrator", "test.analyze", "评估用户意图", "OK")
+    log_action("Executor", "test.execute", "执行浏览器操作", "RUNNING")
+    log_action("Executor", "test.execute", "浏览器操作完成", "DONE")
+    log_action("Orchestrator", "test.verify", "验证执行结果", "OK")
 
     # 读取
     entries = get_recent(limit=10)
     assert len(entries) >= 4, f"日志条目不足: {len(entries)}"
 
-    # 检查最近一条是 Hermes 的 verify
+    # 检查最近一条是 Orchestrator 的 verify
     last = entries[-1]
-    assert last["agent"] == "Hermes", f"最后一条应为Hermes: {last['agent']}"
+    assert last["agent"] == "Orchestrator", f"最后一条应为Orchestrator: {last['agent']}"
     assert last["action"] == "test.verify", f"action应为test.verify: {last['action']}"
 
     # tail 输出
     output = tail_log(4)
-    assert "Hermes" in output
-    assert "OpenClaw" in output
+    assert "Orchestrator" in output
+    assert "Executor" in output
 
     # log_path
     assert log_path().endswith("framework_log.md")
@@ -64,11 +64,11 @@ def test_agent_log_special_chars():
 
     # 包含竖线字符的详情
     detail_with_pipe = "执行结果: a | b | c"
-    log_action("Hermes", "test.special", detail_with_pipe, "OK")
+    log_action("Orchestrator", "test.special", detail_with_pipe, "OK")
 
     # 包含换行的详情
     detail_with_newline = "多行\n详情\n内容"
-    log_action("OpenClaw", "test.multiline", detail_with_newline, "OK")
+    log_action("Executor", "test.multiline", detail_with_newline, "OK")
 
     entries = get_recent(limit=5)
     # 检查是否有条目的 action 是 test.special

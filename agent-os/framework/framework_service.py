@@ -64,7 +64,7 @@ app.add_middleware(
 
 HEALTH_MAP = {
     "Qdrant": {"port": 6333},
-    "OpenClaw": {"port": 18789},
+    "Executor": {"port": 18789},
     "WebUI": {"port": 8648},
     "CDP": {"port": 9333},
 }
@@ -174,7 +174,7 @@ def health_check():
 
 @app.post("/execute")
 def execute_pipeline(req: ExecuteRequest, api_key: str = Depends(get_api_key)):
-    """执行完整九步管线 — 通过 OpenClaw agent 执行实际任务"""
+    """执行完整九步管线 — 通过 Executor agent 执行实际任务"""
     task_id = f"task-{uuid.uuid4().hex[:8]}"
 
     log_action("Framework", "pipeline.start", f"operation={req.operation} user={req.user_id}", "RUNNING")
@@ -204,7 +204,7 @@ def execute_pipeline(req: ExecuteRequest, api_key: str = Depends(get_api_key)):
             # 从环境变量获取 AGENT_DIR，默认值可根据部署调整
             AGENT_DIR = os.environ.get(
                 "FRAMEWORK_AGENT_DIR",
-                os.path.join(os.path.expanduser("~"), ".hermes", "agent-memory")
+                os.path.join(os.path.expanduser("~"), ".agent-os", "agent-memory")
             )
             agent_path = os.path.join(AGENT_DIR, req.target_agent, "memory.md")
             memory_content = ""
@@ -269,35 +269,35 @@ def execute_pipeline(req: ExecuteRequest, api_key: str = Depends(get_api_key)):
                 except Exception:
                     continue
 
-        # 方案B: OpenClaw bridge 模块执行
+        # 方案B: Executor bridge 模块执行
         if _within_timeout():
             try:
-                from core.openclaw_bridge import call_oc, agent as oc_agent
-                # 尝试通过 OpenClaw agent 执行（短超时，避免挂起）
-                result = call_oc(
+                from core.executor_bridge import call_executor, agent as executor_agent
+                # 尝试通过 Executor agent 执行（短超时，避免挂起）
+                result = call_executor(
                     ["agent", "--agent", "main", "--json",
                      "--message", f"[Framework] {req.operation}"],
                     timeout=8
                 )
                 if result["success"] and result["stdout"].strip():
-                    log_action("Framework", "execute.openclaw", f"openclaw:{req.operation}", "OK")
+                    log_action("Framework", "execute.executor", f"executor:{req.operation}", "OK")
                     try:
                         data = json.loads(result["stdout"])
                         return {
                             "content": data.get("text", result["stdout"][:1000]),
-                            "tool": "openclaw",
+                            "tool": "executor",
                             "operation": req.operation,
                         }
                     except (json.JSONDecodeError, ValueError):
                         return {
                             "content": result["stdout"][:1000],
-                            "tool": "openclaw",
+                            "tool": "executor",
                             "operation": req.operation,
                         }
             except Exception:
                 pass
 
-        # 方案C: Hermes 工具（调 Hermes WebUI API）
+        # 方案C: Orchestrator 工具（调 Orchestrator WebUI API）
         if _within_timeout():
             try:
                 import urllib.request
@@ -305,19 +305,19 @@ def execute_pipeline(req: ExecuteRequest, api_key: str = Depends(get_api_key)):
                     "operation": req.operation,
                     "text": req.user_text or req.operation,
                 }).encode()
-                hermes_req = urllib.request.Request(
+                orchestrator_req = urllib.request.Request(
                     "http://127.0.0.1:8648/api/execute",
                     data=req_body,
                     headers={"Content-Type": "application/json"},
                     method="POST",
                 )
-                with urllib.request.urlopen(hermes_req, timeout=5) as resp:
-                    hermes_result = resp.read().decode()
-                    if hermes_result.strip():
-                        log_action("Framework", "execute.hermes", f"hermes:{req.operation}", "OK")
+                with urllib.request.urlopen(orchestrator_req, timeout=5) as resp:
+                    orchestrator_result = resp.read().decode()
+                    if orchestrator_result.strip():
+                        log_action("Framework", "execute.agent-os", f"orchestrator:{req.operation}", "OK")
                         return {
-                            "content": hermes_result[:1000],
-                            "tool": "hermes",
+                            "content": orchestrator_result[:1000],
+                            "tool": "orchestrator",
                             "operation": req.operation,
                         }
             except Exception:
@@ -352,12 +352,12 @@ def execute_pipeline(req: ExecuteRequest, api_key: str = Depends(get_api_key)):
                 pass
 
         # 最终回退: 返回说明
-        log_action("Framework", "execute.fallback", "no executor matched, dispatched to Hermes", "SKIPPED")
+        log_action("Framework", "execute.fallback", "no executor matched, dispatched to Orchestrator", "SKIPPED")
         return {
             "content": f"[DISPATCHED] 操作: {req.operation}",
             "tool": "dispatch",
             "operation": req.operation,
-            "note": "走 Hermes 手动执行流程（请见 /execute 返回自行处理）",
+            "note": "走 Orchestrator 手动执行流程（请见 /execute 返回自行处理）",
         }
 
     try:

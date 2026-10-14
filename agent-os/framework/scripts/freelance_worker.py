@@ -168,7 +168,7 @@ def main():
     args = parser.parse_args()
 
     STATE_FILE = os.path.join(
-        os.path.expanduser("~"), "Desktop", "hermes-logs", "freelance-state.json"
+        os.path.expanduser("~"), "Desktop", "agent-os-logs", "freelance-state.json"
     )
 
     print(r"""

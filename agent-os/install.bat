@@ -183,7 +183,7 @@ echo.
 echo [%HEAD_COLOR%m--- Step 4/12: Installing npm global packages ------------------------------------[0m
 echo.
 
-echo [%INFO_COLOR%m  [INFO][0m Checking/installing: pm2, hermes-web-ui, openclaw ...
+echo [%INFO_COLOR%m  [INFO][0m Checking/installing: pm2, orchestrator-web-ui, executor ...
 
 npm list -g pm2 >nul 2>nul
 if %ERRORLEVEL% equ 0 (
@@ -198,29 +198,41 @@ if %ERRORLEVEL% equ 0 (
     )
 )
 
-npm list -g hermes-web-ui >nul 2>nul
+:: ---------------------------------------------------------------------------
+:: Runtime backend packages (default presets).
+::
+:: The framework orchestrates an external agent runtime. These two npm
+:: packages are the default presets this installer ships with; change them
+:: to target a different runtime that exposes the same CLI / HTTP contract.
+:: ---------------------------------------------------------------------------
+set "RUNTIME_UI_PKG=hermes-web-ui"
+set "RUNTIME_EXEC_PKG=openclaw"
+set "RUNTIME_WEBUI_ARGS=-m hermes.webui_bridge"
+set "RUNTIME_GATEWAY_ARGS=-m hermes.gateway run"
+
+npm list -g !RUNTIME_UI_PKG! >nul 2>nul
 if %ERRORLEVEL% equ 0 (
-    call :pass_echo "hermes-web-ui already installed globally"
+    call :pass_echo "orchestrator UI package already installed globally"
 ) else (
-    echo [%INFO_COLOR%m  [INFO][0m Installing hermes-web-ui globally ...
-    npm install -g hermes-web-ui
+    echo [%INFO_COLOR%m  [INFO][0m Installing orchestrator UI package ...
+    npm install -g !RUNTIME_UI_PKG!
     if %ERRORLEVEL% neq 0 (
-        call :fail_echo "Failed to install hermes-web-ui"
+        call :fail_echo "Failed to install orchestrator UI package"
     ) else (
-        call :pass_echo "hermes-web-ui installed globally"
+        call :pass_echo "orchestrator UI package installed globally"
     )
 )
 
-npm list -g openclaw >nul 2>nul
+npm list -g !RUNTIME_EXEC_PKG! >nul 2>nul
 if %ERRORLEVEL% equ 0 (
-    call :pass_echo "openclaw already installed globally"
+    call :pass_echo "executor package already installed globally"
 ) else (
-    echo [%INFO_COLOR%m  [INFO][0m Installing openclaw globally ...
-    npm install -g openclaw
+    echo [%INFO_COLOR%m  [INFO][0m Installing executor package ...
+    npm install -g !RUNTIME_EXEC_PKG!
     if %ERRORLEVEL% neq 0 (
-        call :fail_echo "Failed to install openclaw"
+        call :fail_echo "Failed to install executor package"
     ) else (
-        call :pass_echo "openclaw installed globally"
+        call :pass_echo "executor package installed globally"
     )
 )
 
@@ -241,10 +253,10 @@ if exist "%VENV_DIR%\Scripts\python.exe" (
     )
 )
 
-echo [%INFO_COLOR%m  [INFO][0m Installing Python dependencies (fastapi, uvicorn, requests, sentence-transformers) ...
+echo [%INFO_COLOR%m  [INFO][0m Installing Python dependencies from requirements.txt ...
 "%VENV_DIR%\Scripts\pip" install --upgrade pip >nul 2>nul
 
-"%VENV_DIR%\Scripts\pip" install fastapi uvicorn requests sentence-transformers
+"%VENV_DIR%\Scripts\pip" install -r "%ROOT%\requirements.txt"
 if %ERRORLEVEL% neq 0 (
     call :fail_echo "Failed to install some Python packages. Check errors above."
 ) else (
@@ -339,12 +351,14 @@ if exist "%ECOSYSTEM_FILE%" (
         call :fail_echo "Template not found: %ECOSYSTEM_TEMPLATE%"
     ) else (
         :: Build all variable values for template replacement
-        set "VAL_HERMES_DIR=%ROOT%\hermes"
-        set "VAL_HERMES_HOME=%USERPROFILE%\.hermes"
-        set "VAL_HERMES_VENV_PY=%VENV_DIR%\Scripts\python.exe"
-        set "VAL_HERMES_WEBUI_PORT=8648"
-        set "VAL_HERMES_GATEWAY_PORT=9090"
-        set "VAL_HERMES_API_KEY=change-me-hermes-api-key"
+        set "VAL_ORCHESTRATOR_DIR=%ROOT%\orchestrator"
+        set "VAL_ORCHESTRATOR_HOME=%USERPROFILE%\.agent-os"
+        set "VAL_ORCHESTRATOR_VENV_PY=%VENV_DIR%\Scripts\python.exe"
+        set "VAL_ORCHESTRATOR_WEBUI_PORT=8648"
+        set "VAL_ORCHESTRATOR_GATEWAY_PORT=9090"
+        set "VAL_ORCHESTRATOR_API_KEY=change-me-orchestrator-api-key"
+        set "VAL_ORCHESTRATOR_WEBUI_ARGS=!RUNTIME_WEBUI_ARGS!"
+        set "VAL_ORCHESTRATOR_GATEWAY_ARGS=!RUNTIME_GATEWAY_ARGS!"
 
         set "VAL_FRAMEWORK_DIR=%FRAMEWORK_DIR%"
         set "VAL_FRAMEWORK_VENV_PY=%VENV_DIR%\Scripts\python.exe"
@@ -353,11 +367,12 @@ if exist "%ECOSYSTEM_FILE%" (
         set "VAL_FRAMEWORK_AGENT_DIR=%ROOT%\data\agents"
         set "VAL_FRAMEWORK_CDP_DIR=%FRAMEWORK_DIR%\scripts"
 
-        set "VAL_OPENCLAW_DIR=%APPDATA%\npm\node_modules\openclaw"
-        set "VAL_OPENCLAW_BIN=%APPDATA%\npm\openclaw"
-        set "VAL_OPENCLAW_PORT=18789"
-        set "VAL_OPENCLAW_CONFIG_DIR=%ROOT%\config"
-        set "VAL_OPENCLAW_API_KEY=change-me-openclaw-api-key"
+        set "VAL_EXECUTOR_DIR=%APPDATA%\npm\node_modules\!RUNTIME_EXEC_PKG!"
+        set "VAL_EXECUTOR_BIN=%APPDATA%\npm\!RUNTIME_EXEC_PKG!"
+        set "VAL_EXECUTOR_PORT=18789"
+        set "VAL_EXECUTOR_CONFIG_DIR=%ROOT%\config"
+        set "VAL_EXECUTOR_API_KEY=change-me-executor-api-key"
+        set "VAL_EXECUTOR_CLI=%RUNTIME_EXEC_PKG%"
 
         if defined CHROME_PATH (
             set "VAL_CHROME_PATH=!CHROME_PATH!"
@@ -383,23 +398,26 @@ if exist "%ECOSYSTEM_FILE%" (
         :: Use PowerShell for robust multi-variable template replacement
         powershell -Command ^
             "$c = Get-Content '%ECOSYSTEM_TEMPLATE%' -Raw; " ^
-            "$c = $c -replace '\{\{HERMES_DIR\}\}',       '!VAL_HERMES_DIR:\=\\!'; " ^
-            "$c = $c -replace '\{\{HERMES_HOME\}\}',      '!VAL_HERMES_HOME:\=\\!'; " ^
-            "$c = $c -replace '\{\{HERMES_VENV_PYTHON\}\}', '!VAL_HERMES_VENV_PY:\=\\!'; " ^
-            "$c = $c -replace '\{\{HERMES_WEBUI_PORT\}\}', '!VAL_HERMES_WEBUI_PORT!'; " ^
-            "$c = $c -replace '\{\{HERMES_GATEWAY_PORT\}\}', '!VAL_HERMES_GATEWAY_PORT!'; " ^
-            "$c = $c -replace '\{\{HERMES_API_KEY\}\}',   '!VAL_HERMES_API_KEY!'; " ^
+            "$c = $c -replace '\{\{ORCHESTRATOR_DIR\}\}',       '!VAL_ORCHESTRATOR_DIR:\=\\!'; " ^
+            "$c = $c -replace '\{\{ORCHESTRATOR_HOME\}\}',      '!VAL_ORCHESTRATOR_HOME:\=\\!'; " ^
+            "$c = $c -replace '\{\{ORCHESTRATOR_VENV_PYTHON\}\}', '!VAL_ORCHESTRATOR_VENV_PY:\=\\!'; " ^
+            "$c = $c -replace '\{\{ORCHESTRATOR_WEBUI_ARGS\}\}', '!VAL_ORCHESTRATOR_WEBUI_ARGS!'; " ^
+            "$c = $c -replace '\{\{ORCHESTRATOR_GATEWAY_ARGS\}\}', '!VAL_ORCHESTRATOR_GATEWAY_ARGS!'; " ^
+            "$c = $c -replace '\{\{ORCHESTRATOR_WEBUI_PORT\}\}', '!VAL_ORCHESTRATOR_WEBUI_PORT!'; " ^
+            "$c = $c -replace '\{\{ORCHESTRATOR_GATEWAY_PORT\}\}', '!VAL_ORCHESTRATOR_GATEWAY_PORT!'; " ^
+            "$c = $c -replace '\{\{ORCHESTRATOR_API_KEY\}\}',   '!VAL_ORCHESTRATOR_API_KEY!'; " ^
             "$c = $c -replace '\{\{FRAMEWORK_DIR\}\}',    '!VAL_FRAMEWORK_DIR:\=\\!'; " ^
             "$c = $c -replace '\{\{FRAMEWORK_VENV_PYTHON\}\}', '!VAL_FRAMEWORK_VENV_PY:\=\\!'; " ^
             "$c = $c -replace '\{\{FRAMEWORK_PORT\}\}',   '!VAL_FRAMEWORK_PORT!'; " ^
             "$c = $c -replace '\{\{FRAMEWORK_API_KEY\}\}', '!VAL_FRAMEWORK_API_KEY!'; " ^
             "$c = $c -replace '\{\{FRAMEWORK_AGENT_DIR\}\}', '!VAL_FRAMEWORK_AGENT_DIR:\=\\!'; " ^
             "$c = $c -replace '\{\{FRAMEWORK_CDP_DIR\}\}', '!VAL_FRAMEWORK_CDP_DIR:\=\\!'; " ^
-            "$c = $c -replace '\{\{OPENCLAW_DIR\}\}',     '!VAL_OPENCLAW_DIR:\=\\!'; " ^
-            "$c = $c -replace '\{\{OPENCLAW_BIN\}\}',     '!VAL_OPENCLAW_BIN:\=\\!'; " ^
-            "$c = $c -replace '\{\{OPENCLAW_PORT\}\}',    '!VAL_OPENCLAW_PORT!'; " ^
-            "$c = $c -replace '\{\{OPENCLAW_CONFIG_DIR\}\}', '!VAL_OPENCLAW_CONFIG_DIR:\=\\!'; " ^
-            "$c = $c -replace '\{\{OPENCLAW_API_KEY\}\}', '!VAL_OPENCLAW_API_KEY!'; " ^
+            "$c = $c -replace '\{\{EXECUTOR_DIR\}\}',     '!VAL_EXECUTOR_DIR:\=\\!'; " ^
+            "$c = $c -replace '\{\{EXECUTOR_BIN\}\}',     '!VAL_EXECUTOR_BIN:\=\\!'; " ^
+            "$c = $c -replace '\{\{EXECUTOR_PORT\}\}',    '!VAL_EXECUTOR_PORT!'; " ^
+            "$c = $c -replace '\{\{EXECUTOR_CONFIG_DIR\}\}', '!VAL_EXECUTOR_CONFIG_DIR:\=\\!'; " ^
+            "$c = $c -replace '\{\{EXECUTOR_API_KEY\}\}', '!VAL_EXECUTOR_API_KEY!'; " ^
+            "$c = $c -replace '\{\{EXECUTOR_CLI\}\}',     '!VAL_EXECUTOR_CLI!'; " ^
             "$c = $c -replace '\{\{CHROME_PATH\}\}',      '!VAL_CHROME_PATH:\=\\!'; " ^
             "$c = $c -replace '\{\{CHROME_USER_DATA_DIR\}\}', '!VAL_CHROME_USER_DIR:\=\\!'; " ^
             "$c = $c -replace '\{\{CDP_PORT\}\}',         '!VAL_CDP_PORT!'; " ^
@@ -458,7 +476,7 @@ if not exist "%ECOSYSTEM_FILE%" (
         call :fail_echo "pm2 not found in PATH — cannot start services"
     ) else (
         echo [%INFO_COLOR%m  [INFO][0m Stopping any existing AgentOS PM2 processes ...
-        for %%S in (hermes-webui-bridge hermes-gateway framework-service openclaw-gateway chrome-cdp qdrant phoenix-watcher) do (
+        for %%S in (orchestrator-webui-bridge orchestrator-gateway framework-service executor-gateway chrome-cdp qdrant phoenix-watcher) do (
             pm2 delete %%S 2>nul
         )
 
@@ -504,10 +522,10 @@ echo [%INFO_COLOR%m    pm2 delete all                [0m— Delete all service
 echo [%INFO_COLOR%m    %VENV_DIR%\Scripts\python     [0m— Python interpreter
 echo.
 echo [%INFO_COLOR%m  Services managed by PM2:[0m
-echo [%INFO_COLOR%m    hermes-webui-bridge   [0m— Hermes Web UI (port 8648)
-echo [%INFO_COLOR%m    hermes-gateway        [0m— Hermes API Gateway (port 9090)
+echo [%INFO_COLOR%m    orchestrator-webui-bridge   [0m— Orchestrator Web UI (port 8648)
+echo [%INFO_COLOR%m    orchestrator-gateway        [0m— Orchestrator API Gateway (port 9090)
 echo [%INFO_COLOR%m    framework-service     [0m— FastAPI Framework (port 18888)
-echo [%INFO_COLOR%m    openclaw-gateway      [0m— OpenClaw Agent Gateway (port 18789)
+echo [%INFO_COLOR%m    executor-gateway      [0m— Executor Agent Gateway (port 18789)
 echo [%INFO_COLOR%m    chrome-cdp            [0m— Headless Chrome CDP (port 9333)
 echo [%INFO_COLOR%m    qdrant                [0m— Vector Database (port 6333)
 echo [%INFO_COLOR%m    phoenix-watcher       [0m— Self-Healing Daemon

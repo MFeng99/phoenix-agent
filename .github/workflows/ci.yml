@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  syntax:
+    name: Syntax & config check
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Byte-compile all Python sources
+        run: python -m compileall -q phoenix agent-os/framework
+
+      - name: Validate JSON configuration files
+        run: |
+          python -c "
+          import json, pathlib, sys
+          bad = 0
+          for p in sorted(pathlib.Path('.').rglob('*.json')):
+              if '.git' in p.parts or 'node_modules' in p.parts:
+                  continue
+              try:
+                  json.loads(p.read_text(encoding='utf-8'))
+              except Exception as e:
+                  print('INVALID:', p, e); bad += 1
+          print('checked all JSON files')
+          sys.exit(1 if bad else 0)
+          "
+
+  tests:
+    name: Unit tests (non-network)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install test dependencies
+        run: pip install pytest requests
+
+      - name: Run module tests
+        working-directory: agent-os/framework
+        run: pytest tests/test_new_modules.py -q

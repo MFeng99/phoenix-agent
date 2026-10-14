@@ -1,89 +1,21 @@
-# GNU Affero General Public License v3 – Comprehensive Summary
+MIT License
 
-> **Source:** [https://www.gnu.org/licenses/agpl-3.0.txt](https://www.gnu.org/licenses/agpl-3.0.txt)  
-> **Version 3, 19 November 2007**  
-> **Copyright (C) 2007 Free Software Foundation, Inc.**
+Copyright (c) 2026 MFeng (https://github.com/MFeng99)
 
-## Key Purpose & Philosophy
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-> "The GNU Affero General Public License is a free, copyleft license for software and other kinds of works, specifically designed to ensure cooperation with the community in the case of network server software."
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-- **Copyleft**: Guarantees freedom to share and change all versions of a program.
-- **Network interaction key difference**: Unlike GPLv3, AGPLv3 closes the “ASP loophole” – if you modify the software and make it available over a network, you must provide the corresponding source to users.
-
-> "It requires the operator of a network server to provide the source code of the modified version running there to the users of that server."
-
-## Definitions (Section 0)
-
-| Term | Meaning |
-|------|---------|
-| **This License** | AGPLv3 |
-| **The Program** | Any copyrightable work licensed under AGPLv3 |
-| **Modify** | Copy from or adapt in a way requiring copyright permission |
-| **Covered work** | Unmodified Program or work based on it |
-| **Propagate** | Any action that would make you liable for infringement (except running or modifying a private copy) |
-| **Convey** | Propagation that enables others to make or receive copies (not mere interaction over network) |
-
-**Appropriate Legal Notices**: Must include copyright notice, no-warranty statement, license information, and how to view a copy of this license.
-
-## Source Code (Section 1)
-
-> "The 'source code' for a work means the preferred form of the work for making modifications to it."
-
-**Corresponding Source** for object code includes all source needed to generate, install, run, and modify the work, including scripts. It excludes:
-- System Libraries
-- General-purpose tools
-- Freely available programs used unmodified
-
-**Does NOT include**: Anything users can regenerate automatically from other parts of the Corresponding Source.
-
-## Basic Permissions (Section 2)
-
-- Rights are granted for the **term of copyright** and are **irreversible** if conditions are met.
-- You have **unlimited permission to run the unmodified Program**.
-- You may make, run, and propagate covered works **without conveying**, as long as license remains in force.
-- You may convey to others solely for them to modify for you or provide facilities, under your direction.
-- **Sublicensing is not allowed** (Section 10 makes it unnecessary).
-
-## Protecting Users from Anti-Circumvention Law (Section 3)
-
-- No covered work shall be deemed part of an effective technological measure under laws implementing WIPO treaty (or similar).
-- When conveying, you **waive any legal power to forbid circumvention** of technological measures by exercise of rights under this License.
-
-## Conveying Verbatim Copies (Section 4)
-
-- Must keep copyright notices, license notices, no-warranty notices intact.
-- Must give recipients a copy of this License.
-- May charge any price; may offer support/warranty for a fee.
-
-## Conveying Modified Source Versions (Section 5)
-
-Conditions (all must be met):
-1. **Prominent notice** stating modifications + date.
-2. **Prominent notice** that work is under this License and any Section 7 additional terms.
-3. **License the entire work** under this License to anyone who gets a copy – applies to all parts.
-4. Interactive interfaces must display **Appropriate Legal Notices** (if the Program had them, you must keep them).
-
-**Aggregate**: Combining with independent works not forming a larger program does NOT cause AGPL to apply to those other works.
-
-## Conveying Non-Source Forms (Section 6)
-
-Object code conveyance must be accompanied by **Corresponding Source** in one of five ways:
-
-| Method | Description |
-|--------|-------------|
-| **6a** | With physical product – source on durable medium |
-| **6b** | With physical product – written offer (valid ≥3 years) to provide source on durable medium for reasonable cost (or network free) |
-| **6c** | Individual copies with written offer from 6b (occasional & noncommercial only) |
-| **6d** | Offer object code from a designated place (free or paid) with equivalent access to source at no further charge – can be on another server with clear directions |
-| **6e** | Peer-to-peer transmission, informing peers of free public access under 6d |
-
-**User Product** = consumer product or anything designed for dwelling. If conveying for use in a User Product, must provide **Installation Information** (methods, keys, etc.) to install modified versions from Corresponding Source. Does NOT require ongoing support/warranty.
-
-**Format requirement** for Corresponding Source and Installation Information: publicly documented, implementation available in source form, no password/key needed.
-
-## Additional Terms (Section 7)
-
-- **Additional permissions** = exceptions from AGPL conditions (can be r
-
-[... summary truncated for context management ...]
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

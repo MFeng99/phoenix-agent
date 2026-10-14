@@ -5,11 +5,11 @@
 ## 测试环境准备
 
 ```bash
-# 启动所有服务
-"F:\AI Agent\framework\scripts\start_all.bat"
+# 启动所有服务（在 agent-os/framework 目录下执行）
+python run.py
 
 # 安装 Python 依赖（首次）
-pip install sentence-transformers requests
+pip install -r requirements.txt
 ```
 
 ---
@@ -17,7 +17,7 @@ pip install sentence-transformers requests
 ## 测试项
 
 ### T1: Browser 工具调用
-- [ ] 打开 Hermes WebUI (http://localhost:8648)
+- [ ] 打开编排器 WebUI (http://localhost:8648)
 - [ ] 输入："帮我用浏览器打开 https://example.com"
 - [ ] 预期：Chrome 浏览器打开页面
 
@@ -45,17 +45,16 @@ pip install sentence-transformers requests
 - [ ] 运行 `python -c "from layers.permission import check_permission; print(check_permission('assistant', 'gateway_restart'))"`
 - [ ] 预期：`allowed: False`
 
-### T7: Guardian 自愈
-- [ ] 启动 Guardian: `cd F:\AI Agent\guardian && node guardian-v3-main.js`
-- [ ] 手动 kill Hermes CLI 进程
-- [ ] 等待 60 秒
-- [ ] 预期：Guardian 检测到异常并自动重启 Hermes
+### T7: Phoenix 自愈
+- [ ] 启动 Phoenix: `python phoenix/phoenix.py`
+- [ ] 手动 kill 一个被监控的服务进程
+- [ ] 等待一个检查周期（默认 30 秒）
+- [ ] 预期：Phoenix 检测到异常并按配置自动重启
 
-### T8: Guardian 互守护
-- [ ] 启动 Main 和 Backup Guardian
-- [ ] 手动 kill Main Guardian 进程
-- [ ] 等待 30 秒
-- [ ] 预期：Backup 检测到 Main 挂掉并拉起
+### T8: Phoenix 熔断保护
+- [ ] 让某个被监控服务持续启动失败
+- [ ] 观察连续失败次数达到 `max_failures` 阈值
+- [ ] 预期：触发熔断进入冷却期，不再反复重启
 
 ### T9: MCP Server 连通
 - [ ] 启动 Framework MCP Server: `python -m mcp_server --port 18766`

@@ -1,6 +1,4 @@
-fastapi
-uvicorn[standard]
-pydantic
-requests
-sentence-transformers
-qdrant-client
+# Framework dependencies are defined once at the agent-os/ level.
+# Included here so that `pip install -r requirements.txt` works from either
+# the agent-os/ directory or this framework/ directory.
+-r ../requirements.txt

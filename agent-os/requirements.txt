@@ -1,9 +1,25 @@
-# AgentOS Framework dependencies
-# Install: pip install -r requirements.txt
-fastapi>=0.100.0
-uvicorn[standard]>=0.20.0
-pydantic>=2.0.0
-requests>=2.28.0
+# AgentOS Framework — Python dependencies
+# Install:  pip install -r requirements.txt
+#
+# This is the single source of truth for Python dependencies of the whole
+# agent-os/ tree. agent-os/framework/requirements.txt includes this file.
+
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.0
+pydantic>=2.5.0
+requests>=2.31.0
 qdrant-client>=1.7.0
-# Optional: sentence-transformers (for embeddings - requires PyTorch)
+
+# ---------------------------------------------------------------------------
+# Optional: semantic embeddings.
+#
+# Enabling this gives higher-quality vector retrieval, but it pulls in
+# PyTorch (~700 MB) and is therefore NOT installed by default.
+#
+# Without it the framework automatically falls back to a deterministic
+# hash-based embedding. Every feature still works end-to-end — only
+# retrieval relevance is lower.
+#
+# To enable:  pip install "sentence-transformers>=2.2.0"
+# ---------------------------------------------------------------------------
 # sentence-transformers>=2.2.0

@@ -1,10 +1,10 @@
-"""OpenClaw Bridge — Python封装，让Hermes调用OpenClaw模块能力
+"""Executor Bridge — Python封装，让Orchestrator调用Executor模块能力
 
 融合模块:
 1. Computer Use — 桌面GUI自动化（截图、点击、输入）
 2. Canvas — WebView可视化渲染仪表盘
 3. Sandbox — Docker隔离执行（需要Docker）
-4. Agent — 通过OpenClaw调度多Agent
+4. Agent — 通过Executor调度多Agent
 """
 
 import subprocess
@@ -21,9 +21,15 @@ except ImportError:
         pass
 
 
-def call_oc(args, timeout=60):
-    """调 openclaw CLI（Windows需shell=True因为它是sh脚本）"""
-    cmd = "openclaw " + " ".join(args)
+# Name (or absolute path) of the executor runtime CLI.
+# The installer sets EXECUTOR_CLI to the actual binary. The neutral default
+# keeps this module importable and testable without a runtime installed.
+EXECUTOR_CLI = os.environ.get("EXECUTOR_CLI", "executor")
+
+
+def call_executor(args, timeout=60):
+    """Invoke the executor runtime CLI (shell=True: on Windows it is a sh script)."""
+    cmd = EXECUTOR_CLI + " " + " ".join(args)
     try:
         result = subprocess.run(cmd, capture_output=True, text=True,
                                 timeout=timeout, shell=True)
@@ -34,7 +40,9 @@ def call_oc(args, timeout=60):
             "exit_code": result.returncode,
         }
     except FileNotFoundError:
-        return {"success": False, "error": "openclaw CLI not found"}
+        return {"success": False,
+                "error": f"executor CLI not found ({EXECUTOR_CLI}); "
+                         f"set EXECUTOR_CLI to its path"}
     except subprocess.TimeoutExpired:
         return {"success": False, "error": f"Timeout ({timeout}s)"}
     except Exception as e:
@@ -55,8 +63,8 @@ def gateway_alive():
 # ─── Agent ──────────────────────────────────────────────────
 
 def agent(message, agent_id="main"):
-    """调度OpenClaw Agent执行任务"""
-    return call_oc(
+    """调度Executor Agent执行任务"""
+    return call_executor(
         ["agent", "--agent", agent_id, "--json", "--message", message],
         timeout=120,
     )
@@ -106,10 +114,10 @@ body {{ font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 </style></head>
 <body>{body}</body></html>"""
 
-    def show(self, html, title="Hermes Canvas"):
+    def show(self, html, title="Orchestrator Canvas"):
         """渲染HTML到Canvas"""
         self._n += 1
-        d = os.path.join(tempfile.gettempdir(), "hermes-canvas")
+        d = os.path.join(tempfile.gettempdir(), "orchestrator-canvas")
         os.makedirs(d, exist_ok=True)
         path = os.path.join(d, f"c{self._n}.html")
         with open(path, "w", encoding="utf-8") as f:
@@ -179,5 +187,5 @@ def health():
     return {
         "gateway": gateway_alive(),
         "docker": docker_ready(),
-        "openclaw_cli": call_oc(["--version"], timeout=5).get("stdout", "").strip(),
+        "executor_cli": call_executor(["--version"], timeout=5).get("stdout", "").strip(),
     }
