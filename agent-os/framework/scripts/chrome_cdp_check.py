@@ -161,6 +161,15 @@ def _evaluate_in_tab(ws_endpoint, expression):
     return None
 
 
+# ANSI colour helpers. Kept out of f-string expressions so the file stays
+# byte-compilable on Python < 3.12, where a backslash is not allowed inside
+# an f-string expression part (PEP 701 relaxed this only in 3.12).
+GREEN = "\033[92m"
+RED = "\033[91m"
+YELLOW = "\033[93m"
+RESET = "\033[0m"
+
+
 def print_table_report(cdp_status, tabs, fiverr_status):
     """打印表格格式报告"""
     sep = "+" + "-" * 40 + "+" + "-" * 18 + "+"
@@ -170,10 +179,10 @@ def print_table_report(cdp_status, tabs, fiverr_status):
 
     # CDP 端口
     if cdp_status["running"]:
-        print(f"| {'CDP 端口 (9333)':<36} | {'\033[92m✓ 运行中\033[0m':<22} |")
+        print(f"| {'CDP 端口 (9333)':<36} | {(GREEN + '✓ 运行中' + RESET):<22} |")
         print(f"|   Browser: {cdp_status['browser'][:30]:<30} | {'':<16} |")
     else:
-        print(f"| {'CDP 端口 (9333)':<36} | {'\033[91m✗ 未运行\033[0m':<22} |")
+        print(f"| {'CDP 端口 (9333)':<36} | {(RED + '✗ 未运行' + RESET):<22} |")
 
     # 标签页数量
     tab_count = len(tabs)
@@ -190,13 +199,13 @@ def print_table_report(cdp_status, tabs, fiverr_status):
 
     # Fiverr 登录状态
     if fiverr_status["tabs_on_fiverr"] == 0:
-        print(f"| {'Fiverr 登录状态':<36} | {'\033[93m? 无标签页\033[0m':<22} |")
+        print(f"| {'Fiverr 登录状态':<36} | {(YELLOW + '? 无标签页' + RESET):<22} |")
     elif fiverr_status["logged_in"]:
         user = fiverr_status.get("username") or "已登录用户"
-        print(f"| {'Fiverr 登录状态':<36} | {'\033[92m✓ 已登录\033[0m':<22} |")
+        print(f"| {'Fiverr 登录状态':<36} | {(GREEN + '✓ 已登录' + RESET):<22} |")
         print(f"|   用户: {user[:30]:<32} | {'':<16} |")
     else:
-        print(f"| {'Fiverr 登录状态':<36} | {'\033[91m✗ 未登录\033[0m':<22} |")
+        print(f"| {'Fiverr 登录状态':<36} | {(RED + '✗ 未登录' + RESET):<22} |")
 
     print(sep)
 

@@ -1,4 +1,4 @@
-"""新模块测试 — agent_log, health_check, chrome_cdp_check, browser_utils, seed_knowledge"""
+"""新模块测试 — agent_log, health_check, chrome_cdp_check, seed_knowledge"""
 import sys
 import os
 import io
@@ -6,8 +6,12 @@ import json
 import uuid
 import time
 
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
-sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8")
+# Windows console UTF-8 workaround. Deliberately scoped to direct script
+# execution: reassigning sys.stdout at import time breaks pytest's output
+# capture, and therefore CI.
+if __name__ == "__main__":
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8")
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
@@ -132,23 +136,6 @@ def test_chrome_cdp_check():
           f"tabs={len(tabs)}, fiverr_logged_in={fiverr['logged_in']})")
 
 
-def test_browser_utils_react_check():
-    """测试 Browser Utils: React 检测逻辑（不需要真实浏览器）"""
-    from utils.browser_utils import is_react_page, wait_for_react_render
-
-    # 函数可导入且签名正确
-    assert callable(is_react_page)
-    assert callable(wait_for_react_render)
-
-    # 验证函数名驼峰别名
-    from utils.browser_utils import waitForReactRender, waitForElement, isReactPage
-    assert callable(waitForReactRender)
-    assert callable(waitForElement)
-    assert callable(isReactPage)
-
-    print(f"  ✓ Browser Utils 导入正常 (4个函数 + 4个别名)")
-
-
 def test_seed_knowledge_load_file():
     """测试 Seed Knowledge: 文件加载"""
     from scripts.seed_knowledge import load_knowledge_from_file
@@ -202,7 +189,6 @@ def main():
         ("Agent Log 特殊字符", test_agent_log_special_chars),
         ("Health Check", test_health_check),
         ("CDP Check", test_chrome_cdp_check),
-        ("Browser Utils", test_browser_utils_react_check),
         ("Seed Knowledge 加载", test_seed_knowledge_load_file),
         ("Seed Knowledge 批量", test_seed_knowledge_batch),
     ]

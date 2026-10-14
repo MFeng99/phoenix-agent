@@ -4,9 +4,11 @@ import os
 import uuid
 import io
 
-# 强制 stdout 使用 UTF-8
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
-sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8")
+# Windows console UTF-8 workaround -- scoped to direct execution only, since
+# reassigning sys.stdout at import time breaks pytest's output capture.
+if __name__ == "__main__":
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8")
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
